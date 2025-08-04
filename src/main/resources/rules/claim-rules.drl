@@ -1,0 +1,38 @@
+package rules
+
+global java.time.LocalDate today;
+
+import com.example.insurance.model.Claim;
+
+rule "Reject expired claims"
+salience 20
+no-loop true
+when
+    $claim : Claim(incidentDate != null && incidentDate.isBefore(today) && claimStatus == null)
+then
+    System.out.println(">>> Rule 'Reject expired claim' fired");
+    $claim.setClaimStatus("REJECTED - EXPIRED");
+    update($claim);
+end
+
+rule "Send high amount claim for review"
+salience 10
+no-loop true
+when
+    $claim : Claim(claimAmount > 100000 && claimStatus == null)
+then
+    System.out.println(">>> Rule 'High amount claim' fired");
+    $claim.setClaimStatus("PENDING MANUAL REVIEW");
+    update($claim);
+end
+
+rule "Approve valid claim"
+salience 0
+no-loop true
+when
+    $claim : Claim(claimStatus == null)
+then
+    System.out.println(">>> Rule 'Approve valid claim' fired");
+    $claim.setClaimStatus("APPROVED");
+    update($claim);
+end
