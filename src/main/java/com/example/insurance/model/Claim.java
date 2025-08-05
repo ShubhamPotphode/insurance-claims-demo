@@ -21,4 +21,9 @@ public class Claim {
     private double claimAmount;
     private String claimStatus;
     private LocalDate incidentDate;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
 }
